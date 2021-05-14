@@ -31,6 +31,7 @@ These datasets consist of three CSV files:
 * Listings file: This file includes how many rooms, beds and bathrooms has, which amenities are included, how many accommodates can be in that property, the property type, the room type, the price of the property, the coordinates where is located, the district where is located and some more.
 * Calendar file: This file includes each property during 2021 if is available or not and with the price of the day.
 * Reviews file: This file includes the user's opinion of the property. This file is not used in this project.
+
 The datasets are obtained from [Insideairbnb Madrid](http://insideairbnb.com/madrid/) and [Insideairbnb Barcelona](http://insideairbnb.com/barcelona/)
 
 ## Results <a name="results"></a>

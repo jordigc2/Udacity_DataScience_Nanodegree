@@ -8,7 +8,7 @@ from nltk.tokenize import word_tokenize
 from flask import Flask
 from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
-from sklearn.externals import joblib
+import joblib
 from sqlalchemy import create_engine
 
 
@@ -26,22 +26,27 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///../data/YourDatabaseName.db')
-df = pd.read_sql_table('YourTableName', engine)
+engine = create_engine('sqlite:///../db/DisasterResponse.db')
+df = pd.read_sql_table('messages', engine)
+df = df.drop(labels=['related'], axis=1)
 
 # load model
-model = joblib.load("../models/your_model_name.pkl")
+model = joblib.load("../models/classifier.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
 def index():
+    print("did it get here?")
     
     # extract data needed for visuals
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
+
+    output_names = df.iloc[:, 4:].sum(axis=0).index
+    output_counts = df.iloc[:, 4:].sum(axis=0).values
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -63,7 +68,26 @@ def index():
                     'title': "Genre"
                 }
             }
+        },
+        {
+            'data': [
+                Bar(
+                    x=output_names,
+                    y=output_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Messages output',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Output type"
+                }
+            }
         }
+
     ]
     
     # encode plotly graphs in JSON
@@ -83,6 +107,9 @@ def go():
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
     classification_results = dict(zip(df.columns[4:], classification_labels))
+
+    print("class labels:", classification_labels)
+    print("class results:", classification_results)
 
     # This will render the go.html Please see that file. 
     return render_template(
